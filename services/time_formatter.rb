@@ -11,43 +11,37 @@ class TimeFormatter
   }.freeze
 
   def initialize(params = {})
-    @format_data = parse_format(params[:format])
+    @format_string = params[:format]
+    @formats = []
+    @wrong_formats = []
   end
 
   def call
+    parse_format
     return unknown_format unless valid_format?
 
-    message = Time.now.strftime(@format_data[:formats].join('-'))
-    { message: message, status: 200 }
+    Time.now.strftime(@formats.join('-'))
+  end
+
+  def valid_format?
+    @wrong_formats.empty?
   end
 
   private
 
-  def valid_format?
-    return false if @format_data[:wrong_formats].any?
-
-    true
-  end
-
   def unknown_format
-    {
-      message: "Unknown time formats: #{@format_data[:wrong_formats]}",
-      status: 400
-    }
+    "Unknown time formats: #{@wrong_formats}"
   end
 
-  def parse_format(format)
-    result = { formats: [], wrong_formats: [] }
-    return result if format.nil?
+  def parse_format
+    return if @format_string.nil?
 
-    format.split(',').each do |f|
+    @format_string.split(',').each do |f|
       if AVAILABLE_FORMATS.key?(f)
-        result[:formats] << AVAILABLE_FORMATS[f]
+        @formats << AVAILABLE_FORMATS[f]
       else
-        result[:wrong_formats] << f
+        @wrong_formats << f
       end
     end
-
-    result
   end
 end

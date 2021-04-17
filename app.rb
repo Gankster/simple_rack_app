@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative 'services/time_formatter'
+
+require 'pry'
 class App
   AVAILABLE_HTTP_METHODS = ['GET'].freeze
   AVAILABLE_PATHS = ['/time'].freeze
@@ -20,7 +22,10 @@ class App
   def collect_response(env)
     data = if valid_route?(env)
              params = permit_params(env)
-             TimeFormatter.new(params).call
+             tf = TimeFormatter.new(params)
+             result = tf.call
+             status = tf.valid_format? ? 200 : 400
+             { message: result, status: status }
            else
              { message: 'Not Found', status: 404 }
            end
