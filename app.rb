@@ -43,14 +43,7 @@ class App
   end
 
   def permit_params(env)
-    query = CGI.unescape(env['QUERY_STRING'])
-    params = {}
-
-    query.split('&').each do |pair|
-      key, value = pair.split('=')
-      params[key.to_sym] = value if PERMIT_PARAMS.include?(key.to_sym)
-    end
-
-    params
+    request = Rack::Request.new(env)
+    { format_data: request.params['format']&.split(',') }
   end
 end

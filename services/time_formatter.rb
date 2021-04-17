@@ -11,7 +11,7 @@ class TimeFormatter
   }.freeze
 
   def initialize(params = {})
-    @format_string = params[:format]
+    @format_data = Array(params[:format_data])
     @formats = []
     @wrong_formats = []
   end
@@ -34,9 +34,9 @@ class TimeFormatter
   end
 
   def parse_format
-    return if @format_string.nil?
+    return if @format_data.empty?
 
-    @format_string.split(',').each do |f|
+    @format_data.each do |f|
       if AVAILABLE_FORMATS.key?(f)
         @formats << AVAILABLE_FORMATS[f]
       else
