@@ -9,17 +9,17 @@ class App
   PERMIT_PARAMS = [:format].freeze
 
   def call(env)
-    response = collect_response(env)
+    response = make_response(env)
     response.finish
   end
 
   private
 
-  def init_response(message: 'Internal server error', status: 500)
+  def response(message: 'Internal server error', status: 500)
     Rack::Response.new(message, status, { 'Content-Type' => 'text/plain' })
   end
 
-  def collect_response(env)
+  def make_response(env)
     data = if valid_route?(env)
              params = permit_params(env)
              tf = TimeFormatter.new(params)
@@ -30,9 +30,9 @@ class App
              { message: 'Not Found', status: 404 }
            end
 
-    init_response(data)
+    response(data)
   rescue StandardError
-    init_response
+    response
   end
 
   def valid_route?(env)
